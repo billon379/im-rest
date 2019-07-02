@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="fun.billon.im.rest.dao.IImGroupDAO">
+
+    <!-- 新增群组 -->
+    <insert id="insertImGroup" parameterType="fun.billon.im.api.model.ImGroupModel" useGeneratedKeys="true"
+            keyProperty="id">
+        INSERT INTO im_group(name, destination, latitude, longitude, password, password_expire_time, max_member,
+                             creator_id)
+        VALUES (#{name}, #{destination}, #{latitude}, #{longitude}, #{password}, #{passwordExpireTime}, #{maxMember},
+                #{creatorId})
+    </insert>
+
+    <!-- 根据主键删除群组 -->
+    <delete id="deleteImGroupByPK" parameterType="fun.billon.im.api.model.ImGroupModel">
+        DELETE FROM im_group
+        <where>
+            id = #{id}
+            AND creator_id = #{creatorId}
+        </where>
+    </delete>
+
+    <!-- 根据主键更新群组信息 -->
+    <update id="updateImGroupByPK" parameterType="fun.billon.im.api.model.ImGroupModel">
+        UPDATE im_group
+        <set>
+            update_time = NOW(),
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="destination != null">
+                destination = #{destination},
+            </if>
+            <if test="latitude > 0">
+                latitude = #{latitude},
+            </if>
+            <if test="longitude > 0">
+                longitude = #{longitude},
+            </if>
+            <if test="password != null">
+                password = #{password},
+            </if>
+            <if test="passwordExpireTime != null">
+                password_expire_time = #{passwordExpireTime},
+            </if>
+            <if test="memberCount != null">
+                member_count = member_count + #{memberCount},
+            </if>
+        </set>
+        <where>
+            id = #{id}
+            AND creator_id = #{creatorId}
+        </where>
+    </update>
+
+    <!-- 根据主键获取群组信息 -->
+    <select id="queryImGroupByPK" parameterType="fun.billon.im.api.model.ImGroupModel" resultMap="resultImGroup">
+        SELECT
+        <include refid="imGroupMapping"/>
+        FROM im_group
+        <where>
+            id = #{id}
+        </where>
+    </select>
+
+    <!-- 根据口令查询群组id -->
+    <select id="queryPKByPassword" parameterType="fun.billon.im.api.model.ImGroupModel" resultType="Integer">
+        SELECT id
+        FROM im_group
+        <where>
+            password = #{password}
+            AND password_expire_time > NOW()
+        </where>
+    </select>
+
+    <!-- 查询字段映射begin -->
+    <!-- im组信息查询字段映射(im_group) -->
+    <sql id="imGroupMapping">
+        id,name,destination,latitude,longitude,password,password_expire_time,
+        max_member,member_count,creator_id,create_time,update_time
+    </sql>
+    <!-- 查询字段映射end -->
+
+    <!-- 查询结果映射begin -->
+    <!-- im组查询结果映射 -->
+    <resultMap id="resultImGroup" type="fun.billon.im.api.model.ImGroupModel">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="destination" column="destination"/>
+        <result property="latitude" column="latitude"/>
+        <result property="longitude" column="longitude"/>
+        <result property="password" column="password"/>
+        <result property="passwordExpireTime" column="password_expire_time"/>
+        <result property="maxMember" column="max_member"/>
+        <result property="memberCount" column="member_count"/>
+        <result property="creatorId" column="creator_id"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+    <!-- 查询结果映射end -->
+
+</mapper>

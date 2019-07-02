@@ -1,0 +1,99 @@
+server:
+  port: 8005
+
+#eureka服务提供方(provider)配置
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://eureka:8000/eureka/
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.cloud.client.ip-address}:${spring.application.name}:${server.port} # 将instance-id设置成ip:端口的形式
+
+#开启hystrix断路器
+feign:
+  hystrix:
+    enabled: true
+#设置读取超时时间
+ribbon.ReadTimeout: 5000
+hystrix:
+  command:
+    default:
+      execution:
+        timeout:
+          enabled: false
+  threadpool:
+    default:
+      #并发执行的最大线程数,默认10
+      coreSize: 400
+
+#spring配置
+spring:
+  application:
+    name: im #服务名称，在eureka注册中心显示
+  main:
+    allow-bean-definition-overriding: true #允许bean重名
+  zipkin:
+    sender:
+      type: rabbit
+  sleuth:
+    sampler:
+      percentage: 1.0 #采样率
+
+  #数据源配置
+  datasource:
+    url: jdbc:mysql://mysql:3306/im?serverTimezone=Asia/Shanghai
+    driver-class-name: com.mysql.jdbc.Driver
+    username: root
+    password: root
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      filters: stat
+      stat-view-servlet:
+        enabled: true
+        login-username: root
+        login-password: billon
+        allow: ""
+      initial-size: 5
+      min-idle: 5
+      max-active: 50
+      validation-query: SELECT 1
+
+  #redis配置
+  redis:
+    host: redis
+    port: 6379
+    password: billon
+    lettuce:
+      pool:
+        max-active: 1024
+        max-idle: 200
+
+  #rabbitmq配置
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    username: billon
+    password: billon
+
+#mybatis配置
+mybatis:
+  mapper-locations: classpath:mappers/*.xml #mapper路径
+
+#暴露actuator相关endpoint
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,loggers
+
+########自定义配置项########
+billon:
+  im:
+    sid: e26591383fd45d4e43a0ea6cd78a0551 #内部服务id
+    port: 18005 #websocket的port
+
+#日志级别
+logging:
+  level:
+    root: info

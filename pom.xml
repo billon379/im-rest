@@ -1,0 +1,130 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>fun.billon</groupId>
+    <artifactId>im-rest</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+    <name>im-rest</name>
+    <url>http://maven.apache.org</url>
+
+    <!-- 必须继承根项目(root),由根项目对第三方依赖的版本进行统一管理-->
+    <parent>
+        <groupId>fun.billon</groupId>
+        <artifactId>root</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <!-- 属性,只定义该项目依赖的内部服务的版本号，第三方依赖定义在root项目中 -->
+    <properties>
+        <!-- 依赖的billon-ms-spring-boot-starter版本 -->
+        <billon.ms.spring.boot.starter.version>1.0.0</billon.ms.spring.boot.starter.version>
+        <!-- 依赖的im-api模块版本 -->
+        <billon.im.api.version>1.0.0</billon.im.api.version>
+        <!-- 依赖的auth-api模块版本 -->
+        <billon.auth.api.version>1.0.0</billon.auth.api.version>
+        <!-- 依赖的member-api模块版本 -->
+        <billon.member.api.version>1.0.0</billon.member.api.version>
+        <!-- 依赖的mq-api模块版本 -->
+        <billon.mq.api.version>1.0.0</billon.mq.api.version>
+    </properties>
+
+    <!-- 依赖项,由根项目(root)管理依赖版本,子项目不需要写依赖的版本号-->
+    <dependencies>
+        <!-- billon-ms-spring-boot-starter版本 -->
+        <dependency>
+            <groupId>fun.billon</groupId>
+            <artifactId>billon-ms-spring-boot-starter</artifactId>
+            <version>${billon.ms.spring.boot.starter.version}</version>
+        </dependency>
+
+        <!-- im-api -->
+        <dependency>
+            <groupId>fun.billon</groupId>
+            <artifactId>im-api</artifactId>
+            <version>${billon.im.api.version}</version>
+        </dependency>
+
+        <!-- auth-api -->
+        <dependency>
+            <groupId>fun.billon</groupId>
+            <artifactId>auth-api</artifactId>
+            <version>${billon.auth.api.version}</version>
+        </dependency>
+
+        <!-- member-api -->
+        <dependency>
+            <groupId>fun.billon</groupId>
+            <artifactId>member-api</artifactId>
+            <version>${billon.member.api.version}</version>
+        </dependency>
+
+        <!-- mq-api -->
+        <dependency>
+            <groupId>fun.billon</groupId>
+            <artifactId>mq-api</artifactId>
+            <version>${billon.mq.api.version}</version>
+        </dependency>
+
+        <!-- lombok,通过注解为所有属性生成setter,getter方法 -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- spring-boot-starter-test -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- netty-socketio -->
+        <dependency>
+            <groupId>com.corundumstudio.socketio</groupId>
+            <artifactId>netty-socketio</artifactId>
+        </dependency>
+    </dependencies>
+
+    <!-- 编译项 -->
+    <build>
+        <finalName>im-rest</finalName>
+        <plugins>
+            <!-- spring-boot-maven-plugin,springboot打包插件 -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- docker-maven-plugin,docker插件 -->
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <configuration>
+                    <!-- 镜像名称 -->
+                    <imageName>${docker.repository.aliyun}/${project.artifactId}:${project.version}</imageName>
+                    <!-- Dockerfile文件地址 -->
+                    <dockerDirectory>${basedir}/src/main/docker</dockerDirectory>
+                    <resources>
+                        <resource>
+                            <!-- ${project.build.directory},项目构建输出目录，默认为target/ -->
+                            <directory>${project.build.directory}</directory>
+                            <!-- ${project.build.directory},打包出来的jar名称 -->
+                            <include>${project.build.finalName}.jar</include>
+                        </resource>
+                    </resources>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
